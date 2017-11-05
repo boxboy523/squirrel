@@ -1,9 +1,32 @@
-from flask import Flask, request, session, render_template
+import sqlite3
+
+from flask import Flask, request, session, render_template, g, redirect ,url_for, \
+    abort, flash
+
+#from __future__ import with_statement
+from contextlib import closing
+
+DATABASE = '/tmp/flaskr.db'
+DEBUG = True
+SECRET_KEY = 'development key'
+USERNAME = 'admin'
+PASSWORD = 'default'
+
 app = Flask(__name__)
+app.config.from_object(__name__)
+
+def connect_db():
+    return sqlite3.connect(app.config['DATABASE'])
+
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource('schema.sql') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
 
 @app.route('/')
-def index(): pass
-    #return '상자아이의 웹페이지 1'
+def index():
+    return '상자아이의 웹페이지 1'
 @app.route('/hello/')
 def hello():
     return 'Hello World!'
